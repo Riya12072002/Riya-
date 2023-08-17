@@ -1,0 +1,16 @@
+import theano
+import theano.tensor as T
+
+# Define symbolic variables
+x = T.scalar('x')
+y = T.scalar('y')
+
+# Define a symbolic expression
+z = x + y
+
+# Create a function to evaluate the expression
+addition = theano.function(inputs=[x, y], outputs=z)
+
+# Evaluate the function with some values
+result = addition(5.0, 3.0)
+print(result)  # This should print: 8.0
