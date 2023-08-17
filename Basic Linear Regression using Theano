@@ -1,0 +1,42 @@
+import theano
+import theano.tensor as T
+import numpy as np
+
+# Generate some random data
+np.random.seed(0)
+X = np.random.rand(100, 1)
+y = 2 * X + 1 + 0.1 * np.random.randn(100, 1)
+
+# Define symbolic variables
+X_sym = T.matrix('X')
+y_sym = T.matrix('y')
+
+# Define model parameters
+W = theano.shared(np.random.randn(1), name='W')
+b = theano.shared(np.random.randn(1), name='b')
+
+# Define symbolic expression for linear regression
+prediction = T.dot(X_sym, W) + b
+
+# Define loss function (mean squared error)
+loss = T.mean((prediction - y_sym)**2)
+
+# Compute gradients
+grad_W = T.grad(loss, W)
+grad_b = T.grad(loss, b)
+
+# Define learning rate
+learning_rate = 0.01
+
+# Update rules for parameters
+updates = [(W, W - learning_rate * grad_W),
+           (b, b - learning_rate * grad_b)]
+
+# Compile training function
+train = theano.function(inputs=[X_sym, y_sym], outputs=loss, updates=updates)
+
+# Training loop
+num_epochs = 100
+for epoch in range(num_epochs):
+    loss_val = train(X, y)
+    print(f"Epoch {epoch+1}, Loss: {loss_val:.4f}, W: {W.get_value()[0]:.4f}, b: {b.get_value()[0]:.4f}")
