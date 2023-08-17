@@ -1,0 +1,37 @@
+import numpy as np
+import theano
+import theano.tensor as T
+
+# Generate some sample data
+np.random.seed(42)
+X = np.random.rand(100, 1)
+y = 2 * X + 1 + 0.1 * np.random.randn(100, 1)
+
+# Define symbolic variables
+x = T.matrix('x')
+y_true = T.matrix('y_true')
+w = theano.shared(np.random.randn(1, 1), name='w')
+b = theano.shared(np.random.randn(1), name='b')
+
+# Define the model and cost function
+y_pred = T.dot(x, w) + b
+cost = T.mean((y_pred - y_true) ** 2)
+
+# Compute gradients and update rules
+grad_w = T.grad(cost, w)
+grad_b = T.grad(cost, b)
+learning_rate = 0.01
+updates = [(w, w - learning_rate * grad_w), (b, b - learning_rate * grad_b)]
+
+# Compile functions
+train = theano.function(inputs=[x, y_true], outputs=cost, updates=updates)
+predict = theano.function(inputs=[x], outputs=y_pred)
+
+# Training loop
+for _ in range(100):
+    train(X, y)
+
+# Make predictions
+X_test = np.array([[0.2], [0.4], [0.6]])
+predictions = predict(X_test)
+print("Predictions:", predictions)
